@@ -34,13 +34,11 @@ function Room() {
       })
     }
 
-    // userStream
-    //   .getTracks()
-    //   .forEach(track => myPeerConnection.addTrack(track, userStream))
-
     socket.on('handle-new-ice-candidate', candidate => {
-      const newCandidate = new RTCIceCandidate(candidate)
-      myPeerConnection.addIceCandidate(newCandidate)
+      if (candidate) {
+        const newCandidate = new RTCIceCandidate(candidate)
+        myPeerConnection.addIceCandidate(newCandidate)
+      }
     })
 
     socket.on('handle-video-offer', createdOffer => {
@@ -80,7 +78,7 @@ function Room() {
     function createPeerConnection() {
       myPeerConnection = new RTCPeerConnection({
         iceServers: [
-          { urls: 'stun:stun.stunprotocol.org' },
+          { urls: 'stun:stun3.l.google.com:19302' },
           {
             urls: 'turn:numb.viagenie.ca',
             credential: 'muazkh',
@@ -95,17 +93,16 @@ function Room() {
     }
 
     function handleICECandidateEvent(event) {
+      console.log(event)
       socket.emit('new-ice-candidate', event.candidate)
     }
 
     function handleTrackEvent(event) {
-
       console.log(event)
       partnerVideo.current.srcObject = event.streams[0]
     }
 
     function handleNegotiationNeededEvent() {
-      console.log('negotiation needed')
       myPeerConnection
         .createOffer()
         .then(function(offer) {
