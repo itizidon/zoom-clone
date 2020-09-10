@@ -11,11 +11,24 @@ let myPeerConnection
 
 let userStream
 
+let displayMediaOptions = {
+  video: {
+    cursor: 'always'
+  },
+  audio: false
+}
+
 function Room() {
   const userVideo = useRef()
   const partnerVideo = useRef()
+  const myScreen = useRef()
 
   useEffect(() => {
+    navigator.mediaDevices
+      .getDisplayMedia(displayMediaOptions)
+      .then(display => {
+        myScreen.current.srcObject = display
+      })
     socket.on('first guy', () => {
       joinroom()
     })
@@ -93,12 +106,10 @@ function Room() {
     }
 
     function handleICECandidateEvent(event) {
-      console.log(event)
       socket.emit('new-ice-candidate', event.candidate)
     }
 
     function handleTrackEvent(event) {
-      console.log(event)
       partnerVideo.current.srcObject = event.streams[0]
     }
 
@@ -119,6 +130,7 @@ function Room() {
       <button onClick={() => socket.emit('join room')}>Connect</button>
       <video autoPlay ref={userVideo}></video>
       <video autoPlay ref={partnerVideo}></video>
+      <video autoPlay ref={myScreen}></video>
     </div>
   )
 }
