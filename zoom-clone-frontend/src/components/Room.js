@@ -21,14 +21,11 @@ function Room() {
   const userVideo = useRef()
   const partnerVideo = useRef()
   const myScreen = useRef()
+  const partnerScreen = useRef()
   const [toggle, setToggle] = useState(true)
+  const [screenShareToggle, setScreenShareToggle] = useState(true)
 
   useEffect(() => {
-    navigator.mediaDevices
-      .getDisplayMedia(displayMediaOptions)
-      .then(display => {
-        myScreen.current.srcObject = display
-      })
     socket.on('first guy', () => {
       joinroom()
     })
@@ -45,6 +42,12 @@ function Room() {
         userVideo.current.srcObject = streamz
         userStream = streamz
       })
+
+      navigator.mediaDevices
+        .getDisplayMedia(displayMediaOptions)
+        .then(display => {
+          myScreen.current.srcObject = display
+        })
     }
 
     socket.on('handle-new-ice-candidate', candidate => {
@@ -136,11 +139,13 @@ function Room() {
         >
           Connect
         </button>
-      ) : <button>ShareScreen</button>}
+      ) : (
+        <button onClick={setScreenShareToggle(false)}>ShareScreen</button>
+      )}
 
       <video autoPlay ref={userVideo}></video>
       <video autoPlay ref={partnerVideo}></video>
-      <video autoPlay ref={myScreen}></video>
+      {screenShareToggle ? null : <video autoPlay ref={myScreen}></video>}
     </div>
   )
 }
