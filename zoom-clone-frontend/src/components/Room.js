@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import io from 'socket.io-client'
 
 let mediaConstraints = {
@@ -8,7 +8,6 @@ let mediaConstraints = {
 const socket = io('http://localhost:8000')
 
 let myPeerConnection
-
 let userStream
 
 let displayMediaOptions = {
@@ -22,6 +21,7 @@ function Room() {
   const userVideo = useRef()
   const partnerVideo = useRef()
   const myScreen = useRef()
+  const [toggle, setToggle] = useState(true)
 
   useEffect(() => {
     navigator.mediaDevices
@@ -127,7 +127,17 @@ function Room() {
 
   return (
     <div>
-      <button onClick={() => socket.emit('join room')}>Connect</button>
+      {toggle ? (
+        <button
+          onClick={() => {
+            socket.emit('join room')
+            setToggle(false)
+          }}
+        >
+          Connect
+        </button>
+      ) : <button>ShareScreen</button>}
+
       <video autoPlay ref={userVideo}></video>
       <video autoPlay ref={partnerVideo}></video>
       <video autoPlay ref={myScreen}></video>
