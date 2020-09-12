@@ -42,13 +42,9 @@ function Room() {
         userVideo.current.srcObject = streamz
         userStream = streamz
       })
-
-      navigator.mediaDevices
-        .getDisplayMedia(displayMediaOptions)
-        .then(display => {
-          myScreen.current.srcObject = display
-        })
     }
+
+    socket.on('startingScreenShare')
 
     socket.on('handle-new-ice-candidate', candidate => {
       if (candidate) {
@@ -128,6 +124,14 @@ function Room() {
     }
   }, [])
 
+  function addScreen() {
+    navigator.mediaDevices
+      .getDisplayMedia(displayMediaOptions)
+      .then(display => {
+        myScreen.current.srcObject = display
+      })
+  }
+
   return (
     <div>
       {toggle ? (
@@ -140,7 +144,15 @@ function Room() {
           Connect
         </button>
       ) : (
-        <button onClick={setScreenShareToggle(false)}>ShareScreen</button>
+        <button
+          onClick={() => {
+            socket.emit('startScreenShare')
+            setScreenShareToggle(false)
+            addScreen()
+          }}
+        >
+          ShareScreen
+        </button>
       )}
 
       <video autoPlay ref={userVideo}></video>
