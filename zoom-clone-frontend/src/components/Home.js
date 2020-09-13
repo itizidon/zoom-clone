@@ -1,9 +1,22 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { v4 as uuidv4 } from 'uuid'
+import { Redirect } from 'react-router'
 
-function Home (){
-  return(
+let id = null
+
+function Home() {
+  const [toggle, setToggle] = useState(true)
+  return (
     <div>
-      <input onSubmit={()=>{}}>Create Room</input>
+      LOL
+      {toggle ? null : <Redirect to={`/room/${id}`}></Redirect>}
+      <button
+        onClick={() => {
+          console.log('clicked')
+          setToggle(false)
+          id = uuidv4()
+        }}
+      >Create Room</button>
     </div>
   )
 }
