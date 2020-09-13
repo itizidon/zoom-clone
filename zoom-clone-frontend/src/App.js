@@ -30,18 +30,17 @@ export default function App() {
           <Route path="/users">
             <Users />
           </Route>
-          <Route path="/">
-            <Home />
-          </Route>
           <Route path="/room/:id">
             <Room />
+          </Route>
+          <Route path="/">
+            <Home />
           </Route>
         </Switch>
       </div>
     </Router>
   )
 }
-
 
 function About() {
   return <h2>About</h2>
