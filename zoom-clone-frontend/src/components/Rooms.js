@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import io from 'socket.io-client'
+import { withRouter } from "react-router";
 
 const socket = io('http://localhost:8000')
 
@@ -8,11 +9,13 @@ let mediaConstraints = {
   video: true // ...and we want a video track
 }
 
-function Rooms() {
+let userStream
+
+function Rooms(props) {
   const userVideo = useRef()
   const otherStreams = useRef([])
   useEffect(() => {
-    socket.on('first guy', () => {
+    socket.on('createroom', () => {
       joinroom()
     })
   })
@@ -21,16 +24,15 @@ function Rooms() {
     // createPeerConnection()
     navigator.mediaDevices.getUserMedia(mediaConstraints).then(streamz => {
       userVideo.current.srcObject = streamz
-      // userStream = streamz
+      userStream = streamz
     })
   }
-
   return (
     <div>
       <video autoPlay ref={userVideo}></video>
       <button
         onClick={() => {
-          socket.emit('join room')
+          socket.emit('connectToRooms', props.match.params.id)
         }}
       >
         Connect
@@ -39,4 +41,4 @@ function Rooms() {
   )
 }
 
-export default Rooms
+export default withRouter(Rooms)

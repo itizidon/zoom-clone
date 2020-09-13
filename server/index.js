@@ -11,10 +11,11 @@ let room = { empty: true }
 
 io.on('connection', socket => {
 
+  socket.on('connectToRooms', roomNum =>{
+    socket.join(roomNum)
+  })
 
-
-
-  socket.on('join room', ()=>{
+  socket.on('join room', (roomNum)=>{
     if(room.empty){
       io.to(socket.id).emit('first guy')
       room.empty = false
@@ -34,6 +35,8 @@ io.on('connection', socket => {
   socket.on('new-ice-candidate', candidate=>{
     socket.broadcast.emit('handle-new-ice-candidate', candidate)
   })
+
+  console.log(socket.id)
 })
 
 server.listen(8000, () => console.log('running on 800'))
