@@ -9,14 +9,15 @@ function Home() {
   return (
     <div>
       LOL
-      {toggle ? null : <Redirect to={`/room/${id}`}></Redirect>}
+      {toggle ? null : <Redirect to={`/rooms/${id}`}></Redirect>}
       <button
         onClick={() => {
-          console.log('clicked')
           setToggle(false)
           id = uuidv4()
         }}
-      >Create Room</button>
+      >
+        Create Room
+      </button>
     </div>
   )
 }

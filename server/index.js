@@ -10,6 +10,10 @@ import cors from 'cors'
 let room = { empty: true }
 
 io.on('connection', socket => {
+
+
+
+
   socket.on('join room', ()=>{
     if(room.empty){
       io.to(socket.id).emit('first guy')

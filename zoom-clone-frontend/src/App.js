@@ -1,6 +1,6 @@
 import React from 'react'
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom'
-import Room from './components/Room'
+import Rooms from './components/Rooms'
 import Home from './components/Home'
 
 export default function App() {
@@ -30,8 +30,8 @@ export default function App() {
           <Route path="/users">
             <Users />
           </Route>
-          <Route path="/room/:id">
-            <Room />
+          <Route path="/rooms/:id">
+            <Rooms />
           </Route>
           <Route path="/">
             <Home />
