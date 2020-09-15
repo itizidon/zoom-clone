@@ -15,12 +15,16 @@ io.on('connection', socket => {
     socket.to(roomNum).emit('connectToRoom')
   })
 
-  socket.on('video-answer-to-room',({roomNum, sdp})=>{
+  socket.on('video-answer-to-room', ({ roomNum, sdp }) => {
     socket.to(roomNum).emit('handle-answer-to-room', sdp)
   })
 
   socket.on('video-offer-to-room', ({ sdp, roomNum }) => {
     socket.to(roomNum).emit('handle-offer-to-room', sdp)
+  })
+
+  socket.on('new-ice-candidate-to-room', ({ roomNum, candidate }) => {
+    socket.to(roomNum).emit('handle-new-ice-candidate-to-room', candidate)
   })
 
   socket.on('join room', roomNum => {

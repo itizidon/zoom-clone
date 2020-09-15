@@ -9,19 +9,26 @@ let mediaConstraints = {
   video: true // ...and we want a video track
 }
 
-
 let myPeerConnection
 let userStream
 
 function Rooms(props) {
   const userVideo = useRef()
   const otherStreams = useRef([])
+  const partnerVideo = useRef()
   useEffect(() => {
     socket.on('connectToRoom', () => {
       joinroom()
     })
 
-    socket.on('handle-video-answer', createdAnswer => {
+    socket.on('handle-new-ice-candidate', candidate => {
+      if (candidate) {
+        const newCandidate = new RTCIceCandidate(candidate)
+        myPeerConnection.addIceCandidate(newCandidate)
+      }
+    })
+
+    socket.on('handle-answer-to-room', createdAnswer => {
       const desc = new RTCSessionDescription(createdAnswer)
       myPeerConnection.setRemoteDescription(desc)
     })
@@ -50,7 +57,10 @@ function Rooms(props) {
           return myPeerConnection.setLocalDescription(answer)
         })
         .then(() => {
-          socket.emit('video-answer', {roomNum: props.match.params.id, sdp: myPeerConnection.localDescription})
+          socket.emit('video-answer-to-room', {
+            roomNum: props.match.params.id,
+            sdp: myPeerConnection.localDescription
+          })
         })
     })
   })
@@ -82,7 +92,7 @@ function Rooms(props) {
         return myPeerConnection.setLocalDescription(offer)
       })
       .then(() => {
-        socket.emit('video-offer', {
+        socket.emit('video-offer-to-room', {
           sdp: myPeerConnection.localDescription,
           roomNum: props.match.params.id
         })
@@ -97,6 +107,13 @@ function Rooms(props) {
       streamz
         .getTracks()
         .forEach(track => myPeerConnection.addTrack(track, streamz))
+    })
+  }
+
+  function handleICECandidateEvent(event) {
+    socket.emit('new-ice-candidate-to-room', {
+      roomNum: props.match.params.id,
+      candidate: event.candidate
     })
   }
 
