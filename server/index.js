@@ -10,29 +10,37 @@ import cors from 'cors'
 let room = { empty: true }
 
 io.on('connection', socket => {
-
-  socket.on('connectToRooms', roomNum =>{
+  socket.on('connectToRooms', roomNum => {
     socket.join(roomNum)
+    socket.to(roomNum).emit('connectToRoom')
   })
 
-  socket.on('join room', (roomNum)=>{
-    if(room.empty){
+  socket.on('video-answer-to-room',({roomNum, sdp})=>{
+    socket.to(roomNum).emit('handle-answer-to-room', sdp)
+  })
+
+  socket.on('video-offer-to-room', ({ sdp, roomNum }) => {
+    socket.to(roomNum).emit('handle-offer-to-room', sdp)
+  })
+
+  socket.on('join room', roomNum => {
+    if (room.empty) {
       io.to(socket.id).emit('first guy')
       room.empty = false
-    }
-    else{
+    } else {
       socket.broadcast.emit('createConnection')
     }
   })
 
-  socket.on('video-offer', createdOffer=>{
+  socket.on('video-offer', createdOffer => {
     socket.broadcast.emit('handle-video-offer', createdOffer)
   })
 
-  socket.on('video-answer', createdAnswer=>{
+  socket.on('video-answer', createdAnswer => {
     socket.broadcast.emit('handle-video-answer', createdAnswer)
   })
-  socket.on('new-ice-candidate', candidate=>{
+
+  socket.on('new-ice-candidate', candidate => {
     socket.broadcast.emit('handle-new-ice-candidate', candidate)
   })
 
