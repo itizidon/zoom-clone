@@ -34,22 +34,23 @@ function Rooms(props) {
     })
 
     socket.on('handle-offer-to-room', createdOffer => {
-      createPeerConnection()
-      var localStream
+      console.log('handle-offer-room is hit')
+      // createPeerConnection()
+      // var localStream
       var desc = new RTCSessionDescription(createdOffer)
 
       myPeerConnection
         .setRemoteDescription(desc)
-        .then(() => {
-          return navigator.mediaDevices.getUserMedia(mediaConstraints)
-        })
-        .then(stream => {
-          localStream = stream
-          userVideo.current.srcObject = localStream
-          localStream
-            .getTracks()
-            .forEach(track => myPeerConnection.addTrack(track, localStream))
-        })
+        // .then(() => {
+        //   return navigator.mediaDevices.getUserMedia(mediaConstraints)
+        // })
+        // .then(stream => {
+        //   console.log(userStream,'localstream')
+        //   userVideo.current.srcObject = localStream
+        //   localStream
+        //     .getTracks()
+        //     .forEach(track => myPeerConnection.addTrack(track, localStream))
+        // })
         .then(() => {
           return myPeerConnection.createAnswer()
         })
@@ -66,6 +67,7 @@ function Rooms(props) {
   })
 
   function handleTrackEvent(event) {
+    console.log(event.streams)
     partnerVideo.current.srcObject = event.streams[0]
   }
 
@@ -100,6 +102,7 @@ function Rooms(props) {
   }
 
   function joinroom() {
+    console.log('reached join roon')
     createPeerConnection()
     navigator.mediaDevices.getUserMedia(mediaConstraints).then(streamz => {
       userVideo.current.srcObject = streamz
@@ -120,9 +123,11 @@ function Rooms(props) {
   return (
     <div>
       <video autoPlay ref={userVideo}></video>
+      <video autoPlay ref={partnerVideo}></video>
       <button
         onClick={() => {
           socket.emit('connectToRooms', props.match.params.id)
+          joinroom()
         }}
       >
         Connect

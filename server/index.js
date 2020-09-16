@@ -16,10 +16,12 @@ io.on('connection', socket => {
   })
 
   socket.on('video-answer-to-room', ({ roomNum, sdp }) => {
+    console.log('video-answer-toroom hit')
     socket.to(roomNum).emit('handle-answer-to-room', sdp)
   })
 
   socket.on('video-offer-to-room', ({ sdp, roomNum }) => {
+    console.log('video-offer-to-room',roomNum)
     socket.to(roomNum).emit('handle-offer-to-room', sdp)
   })
 
