@@ -132,7 +132,6 @@ function Rooms(props) {
       <button
         onClick={() => {
           socket.emit('connectToRooms', props.match.params.id)
-          joinroom()
         }}
       >
         Connect

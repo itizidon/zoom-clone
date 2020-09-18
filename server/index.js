@@ -12,9 +12,13 @@ let room = { empty: true }
 io.on('connection', socket => {
   socket.on('connectToRooms', roomNum => {
     socket.join(roomNum, () => {
-      socket.to(roomNum).emit('connectToRoom')
-      let joinedRooms = Object.keys(socket.rooms)
-      console.log(io.sockets.adapter.rooms[roomNum].sockets)
+      console.log(Object.keys(io.sockets.adapter.rooms[roomNum].sockets).length)
+      if (Object.keys(io.sockets.adapter.rooms[roomNum].sockets).length >= 1) {
+        console.log('this is hit')
+        socket.to(roomNum).emit('connectToRoom')
+      } else {
+        io.to(roomNum).emit('connectToRoom')
+      }
     })
   })
 
@@ -50,9 +54,6 @@ io.on('connection', socket => {
   socket.on('new-ice-candidate', candidate => {
     socket.broadcast.emit('handle-new-ice-candidate', candidate)
   })
-
-
-
 })
 
 server.listen(8000, () => console.log('running on 800'))
