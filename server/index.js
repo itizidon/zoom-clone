@@ -11,8 +11,11 @@ let room = { empty: true }
 
 io.on('connection', socket => {
   socket.on('connectToRooms', roomNum => {
-    socket.join(roomNum)
-    socket.to(roomNum).emit('connectToRoom')
+    socket.join(roomNum, () => {
+      socket.to(roomNum).emit('connectToRoom')
+      let joinedRooms = Object.keys(socket.rooms)
+      console.log(io.sockets.adapter.rooms[roomNum].sockets)
+    })
   })
 
   socket.on('video-answer-to-room', ({ roomNum, sdp }) => {
@@ -48,7 +51,8 @@ io.on('connection', socket => {
     socket.broadcast.emit('handle-new-ice-candidate', candidate)
   })
 
-  console.log(socket.id)
+
+
 })
 
 server.listen(8000, () => console.log('running on 800'))

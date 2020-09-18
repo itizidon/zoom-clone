@@ -10,14 +10,13 @@ let mediaConstraints = {
   video: true // ...and we want a video track
 }
 
-let allVideos = []
-
 let myPeerConnection
 let userStream
 
 function Rooms(props) {
   const userVideo = useRef()
   const otherStreams = useRef([])
+  const allVideos = useRef([])
 
   const partnerVideo = useRef()
   useEffect(() => {
@@ -45,16 +44,6 @@ function Rooms(props) {
 
       myPeerConnection
         .setRemoteDescription(desc)
-        // .then(() => {
-        //   return navigator.mediaDevices.getUserMedia(mediaConstraints)
-        // })
-        // .then(stream => {
-        //   console.log(userStream,'localstream')
-        //   userVideo.current.srcObject = localStream
-        //   localStream
-        //     .getTracks()
-        //     .forEach(track => myPeerConnection.addTrack(track, localStream))
-        // })
         .then(() => {
           return myPeerConnection.createAnswer()
         })
@@ -71,13 +60,17 @@ function Rooms(props) {
   })
 
   function handleTrackEvent(event) {
-    console.log(event.streams)
     partnerVideo.current.srcObject = event.streams[0]
-    const video = document.createElement(counter)
-    counter++
+    console.log(event.streams)
+    // console.log(partnerVideo.current)
 
-    video.srcObject = event.streams[0]
-    allVideos.push(video)
+    allVideos.current.push(React.createRef())
+    // console.log(allVideos.current.length, 'this is all videos current')
+    // allVideos.current[allVideos.current.length - 1].current = {
+    //   srcObject: event.streams[event.streams.length -1]
+    // }
+    // console.log('added track hit')
+    console.log(allVideos)
   }
 
   function createPeerConnection() {
@@ -133,9 +126,9 @@ function Rooms(props) {
     <div>
       <video autoPlay ref={userVideo}></video>
       <video autoPlay ref={partnerVideo}></video>
-      {allVideos.map((cur,ind)=>{
-        return <video autoPlay ref={cur}></video>
-      })}
+      {/* {allVideos.current.map((cur,ind)=>{
+        return <video autoPlay ref={cur.current}></video>
+      })} */}
       <button
         onClick={() => {
           socket.emit('connectToRooms', props.match.params.id)
