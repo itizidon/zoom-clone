@@ -3,11 +3,14 @@ import io from 'socket.io-client'
 import { withRouter } from 'react-router'
 
 const socket = io('http://localhost:8000')
+let counter = 0
 
 let mediaConstraints = {
   audio: true, // We want an audio track
   video: true // ...and we want a video track
 }
+
+let allVideos = []
 
 let myPeerConnection
 let userStream
@@ -15,6 +18,7 @@ let userStream
 function Rooms(props) {
   const userVideo = useRef()
   const otherStreams = useRef([])
+
   const partnerVideo = useRef()
   useEffect(() => {
     socket.on('connectToRoom', () => {
@@ -69,6 +73,11 @@ function Rooms(props) {
   function handleTrackEvent(event) {
     console.log(event.streams)
     partnerVideo.current.srcObject = event.streams[0]
+    const video = document.createElement(counter)
+    counter++
+
+    video.srcObject = event.streams[0]
+    allVideos.push(video)
   }
 
   function createPeerConnection() {
@@ -124,6 +133,9 @@ function Rooms(props) {
     <div>
       <video autoPlay ref={userVideo}></video>
       <video autoPlay ref={partnerVideo}></video>
+      {allVideos.map((cur,ind)=>{
+        return <video autoPlay ref={cur}></video>
+      })}
       <button
         onClick={() => {
           socket.emit('connectToRooms', props.match.params.id)
