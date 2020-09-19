@@ -13,11 +13,12 @@ io.on('connection', socket => {
   socket.on('connectToRooms', roomNum => {
     socket.join(roomNum, () => {
       console.log(Object.keys(io.sockets.adapter.rooms[roomNum].sockets).length)
-      if (Object.keys(io.sockets.adapter.rooms[roomNum].sockets).length >= 1) {
+      if (Object.keys(io.sockets.adapter.rooms[roomNum].sockets).length === 1) {
         console.log('this is hit')
-        socket.to(roomNum).emit('connectToRoom')
-      } else {
         io.to(roomNum).emit('connectToRoom')
+      } else {
+        console.log('more than 1 is hit')
+        socket.to(roomNum).emit('makeConnection')
       }
     })
   })

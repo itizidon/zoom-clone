@@ -24,6 +24,13 @@ function Rooms(props) {
       joinroom()
     })
 
+    socket.on('makeConnection', () => {
+      console.log('we are hit homie')
+      userStream
+        .getTracks()
+        .forEach(track => myPeerConnection.addTrack(track, userStream))
+    })
+
     socket.on('handle-new-ice-candidate', candidate => {
       if (candidate) {
         const newCandidate = new RTCIceCandidate(candidate)
@@ -32,18 +39,40 @@ function Rooms(props) {
     })
 
     socket.on('handle-answer-to-room', createdAnswer => {
+      console.log('handle answer')
       const desc = new RTCSessionDescription(createdAnswer)
       myPeerConnection.setRemoteDescription(desc)
     })
 
     socket.on('handle-offer-to-room', createdOffer => {
+      createPeerConnection()
       console.log('handle-offer-room is hit')
-      // createPeerConnection()
       // var localStream
       var desc = new RTCSessionDescription(createdOffer)
 
       myPeerConnection
         .setRemoteDescription(desc)
+        .then(() => {
+          return navigator.mediaDevices.getUserMedia(mediaConstraints)
+        })
+        .then(stream => {
+          userVideo.current.srcObject = stream
+          userStream = stream
+          userStream.getTracks().forEach(track => {
+            myPeerConnection.addTrack(track, userStream)
+          })
+        })
+        // .then(() => {
+        //   navigator.mediaDevices
+        //     .getUserMedia(mediaConstraints)
+        //     .then(streamz => {
+        //       userVideo.current.srcObject = streamz
+        //       userStream = streamz
+        //       streamz
+        //         .getTracks()
+        //         .forEach(track => myPeerConnection.addTrack(track, streamz))
+        //     })
+        // })
         .then(() => {
           return myPeerConnection.createAnswer()
         })
@@ -60,8 +89,8 @@ function Rooms(props) {
   })
 
   function handleTrackEvent(event) {
+    console.log('added events',event)
     partnerVideo.current.srcObject = event.streams[0]
-    console.log(event.streams)
     // console.log(partnerVideo.current)
 
     allVideos.current.push(React.createRef())
@@ -70,10 +99,10 @@ function Rooms(props) {
     //   srcObject: event.streams[event.streams.length -1]
     // }
     // console.log('added track hit')
-    console.log(allVideos)
   }
 
   function createPeerConnection() {
+    console.log('created peer')
     myPeerConnection = new RTCPeerConnection({
       iceServers: [
         { urls: 'stun:stun3.l.google.com:19302' },
@@ -90,6 +119,7 @@ function Rooms(props) {
   }
 
   function handleNegotiationNeededEvent() {
+    console.log('negotiationneeded ')
     myPeerConnection
       .createOffer()
       .then(function(offer) {
@@ -109,9 +139,6 @@ function Rooms(props) {
     navigator.mediaDevices.getUserMedia(mediaConstraints).then(streamz => {
       userVideo.current.srcObject = streamz
       userStream = streamz
-      streamz
-        .getTracks()
-        .forEach(track => myPeerConnection.addTrack(track, streamz))
     })
   }
 
