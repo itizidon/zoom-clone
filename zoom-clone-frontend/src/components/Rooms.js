@@ -20,6 +20,11 @@ function Rooms(props) {
 
   const partnerVideo = useRef()
   useEffect(() => {
+    navigator.mediaDevices.getUserMedia(mediaConstraints).then(streamz => {
+      userVideo.current.srcObject = streamz
+      userStream = streamz
+    })
+
     socket.on('connectToRoom', () => {
       joinroom()
     })
@@ -33,6 +38,7 @@ function Rooms(props) {
 
     socket.on('handle-new-ice-candidate', candidate => {
       if (candidate) {
+        console.log('handle-new-ice-candidate')
         const newCandidate = new RTCIceCandidate(candidate)
         myPeerConnection.addIceCandidate(newCandidate)
       }
@@ -52,28 +58,15 @@ function Rooms(props) {
 
       myPeerConnection
         .setRemoteDescription(desc)
-        .then(() => {
-          return navigator.mediaDevices.getUserMedia(mediaConstraints)
-        })
         .then(stream => {
-          userVideo.current.srcObject = stream
-          userStream = stream
+          console.log(userStream, 'userStream')
           userStream.getTracks().forEach(track => {
             myPeerConnection.addTrack(track, userStream)
+            return 'lol'
           })
         })
-        // .then(() => {
-        //   navigator.mediaDevices
-        //     .getUserMedia(mediaConstraints)
-        //     .then(streamz => {
-        //       userVideo.current.srcObject = streamz
-        //       userStream = streamz
-        //       streamz
-        //         .getTracks()
-        //         .forEach(track => myPeerConnection.addTrack(track, streamz))
-        //     })
-        // })
         .then(() => {
+          console.log('this skipped user stream')
           return myPeerConnection.createAnswer()
         })
         .then(function(answer) {
@@ -89,7 +82,7 @@ function Rooms(props) {
   })
 
   function handleTrackEvent(event) {
-    console.log('added events',event)
+    console.log('added events', event.streams)
     partnerVideo.current.srcObject = event.streams[0]
     // console.log(partnerVideo.current)
 
@@ -136,17 +129,20 @@ function Rooms(props) {
   function joinroom() {
     console.log('reached join roon')
     createPeerConnection()
-    navigator.mediaDevices.getUserMedia(mediaConstraints).then(streamz => {
-      userVideo.current.srcObject = streamz
-      userStream = streamz
-    })
+    // navigator.mediaDevices.getUserMedia(mediaConstraints).then(streamz => {
+    //   userVideo.current.srcObject = streamz
+    //   userStream = streamz
+    // })
   }
 
   function handleICECandidateEvent(event) {
-    socket.emit('new-ice-candidate-to-room', {
-      roomNum: props.match.params.id,
-      candidate: event.candidate
-    })
+    console.log('new-ice-candidate-toroom')
+    if (event.candidate) {
+      socket.emit('new-ice-candidate-to-room', {
+        roomNum: props.match.params.id,
+        candidate: event.candidate
+      })
+    }
   }
 
   return (
