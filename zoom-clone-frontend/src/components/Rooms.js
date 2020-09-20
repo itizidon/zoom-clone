@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, createRef } from 'react'
 import io from 'socket.io-client'
 import { withRouter } from 'react-router'
 
@@ -16,11 +16,13 @@ let userStream
 function Rooms(props) {
   const userVideo = useRef()
   const otherStreams = useRef([])
-  const allVideos = useRef([])
-
+  const [allVideos, setAllVideos] = useState([])
   const partnerVideo = useRef()
+  const [toggle, setToggle] = useState(false)
+
   useEffect(() => {
     navigator.mediaDevices.getUserMedia(mediaConstraints).then(streamz => {
+      console.log('captured screen')
       userVideo.current.srcObject = streamz
       userStream = streamz
     })
@@ -30,11 +32,11 @@ function Rooms(props) {
     })
 
     socket.on('makeConnection', () => {
-      console.log('we are hit homie')
       userStream
         .getTracks()
         .forEach(track => myPeerConnection.addTrack(track, userStream))
     })
+    console.log(userVideo, 'this is userVideo')
 
     socket.on('handle-new-ice-candidate', candidate => {
       if (candidate) {
@@ -59,10 +61,9 @@ function Rooms(props) {
       myPeerConnection
         .setRemoteDescription(desc)
         .then(stream => {
-          console.log(userStream, 'userStream')
           userStream.getTracks().forEach(track => {
             myPeerConnection.addTrack(track, userStream)
-            return 'lol'
+            return 'return'
           })
         })
         .then(() => {
@@ -86,8 +87,9 @@ function Rooms(props) {
     partnerVideo.current.srcObject = event.streams[0]
     // console.log(partnerVideo.current)
 
-    allVideos.current.push(React.createRef())
-    // console.log(allVideos.current.length, 'this is all videos current')
+    setAllVideos(allVideos.push(React.createRef()))
+    // allVideos.current[0].current.srcObject=event.stream[0]
+    console.log(allVideos, 'this is all videos current')
     // allVideos.current[allVideos.current.length - 1].current = {
     //   srcObject: event.streams[event.streams.length -1]
     // }
@@ -129,10 +131,6 @@ function Rooms(props) {
   function joinroom() {
     console.log('reached join roon')
     createPeerConnection()
-    // navigator.mediaDevices.getUserMedia(mediaConstraints).then(streamz => {
-    //   userVideo.current.srcObject = streamz
-    //   userStream = streamz
-    // })
   }
 
   function handleICECandidateEvent(event) {
@@ -144,21 +142,27 @@ function Rooms(props) {
       })
     }
   }
-
+  console.log(allVideos.length, 'this is length')
   return (
     <div>
       <video autoPlay ref={userVideo}></video>
       <video autoPlay ref={partnerVideo}></video>
-      {/* {allVideos.current.map((cur,ind)=>{
-        return <video autoPlay ref={cur.current}></video>
-      })} */}
-      <button
-        onClick={() => {
-          socket.emit('connectToRooms', props.match.params.id)
-        }}
-      >
-        Connect
-      </button>
+      {allVideos.length >= 1
+        ? allVideos.map(cur => {
+            console.log(cur, 'this is cur')
+            return <video autoPlay ref={cur}></video>
+          })
+        : null}
+      {toggle ? (
+        <button
+          onClick={() => {
+            socket.emit('connectToRooms', props.match.params.id)
+            setToggle(true)
+          }}
+        >
+          Connect
+        </button>
+      ) : null}
     </div>
   )
 }
