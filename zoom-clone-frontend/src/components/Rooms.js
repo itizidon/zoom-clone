@@ -18,7 +18,6 @@ function Rooms(props) {
   const otherStreams = useRef([])
   const [allVideos, setAllVideos] = useState([])
   const partnerVideo = useRef()
-  const [toggle, setToggle] = useState(false)
 
   useEffect(() => {
     navigator.mediaDevices.getUserMedia(mediaConstraints).then(streamz => {
@@ -87,7 +86,7 @@ function Rooms(props) {
     partnerVideo.current.srcObject = event.streams[0]
     // console.log(partnerVideo.current)
 
-    setAllVideos(allVideos.push(React.createRef()))
+    setAllVideos(oldArray=>[...oldArray, React.createRef()])
     // allVideos.current[0].current.srcObject=event.stream[0]
     console.log(allVideos, 'this is all videos current')
     // allVideos.current[allVideos.current.length - 1].current = {
@@ -142,7 +141,9 @@ function Rooms(props) {
       })
     }
   }
-  console.log(allVideos.length, 'this is length')
+  if (allVideos) {
+    console.log(allVideos, 'this is allVideos array')
+  }
   return (
     <div>
       <video autoPlay ref={userVideo}></video>
@@ -153,16 +154,18 @@ function Rooms(props) {
             return <video autoPlay ref={cur}></video>
           })
         : null}
-      {toggle ? (
-        <button
-          onClick={() => {
-            socket.emit('connectToRooms', props.match.params.id)
-            setToggle(true)
-          }}
-        >
-          Connect
-        </button>
-      ) : null}
+      {/* <div>
+        {allVideos.map(() => {
+          return 'lol'
+        })}
+      </div> */}
+      <button
+        onClick={() => {
+          socket.emit('connectToRooms', props.match.params.id)
+        }}
+      >
+        Connect
+      </button>
     </div>
   )
 }
