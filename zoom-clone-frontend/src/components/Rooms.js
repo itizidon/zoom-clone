@@ -151,7 +151,7 @@ function Rooms(props) {
       {allVideos.length >= 1
         ? allVideos.map(cur => {
             console.log(cur, 'this is cur')
-            return <video autoPlay ref={cur}></video>
+            return <video autoPlay ref={cur.current}></video>
           })
         : null}
       {/* <div>
