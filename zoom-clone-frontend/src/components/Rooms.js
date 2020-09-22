@@ -80,7 +80,7 @@ function Rooms(props) {
           })
         })
     })
-  },[])
+  }, [])
 
   function handleTrackEvent(event) {
     console.log('added events', event.streams)
@@ -91,24 +91,33 @@ function Rooms(props) {
       // setAllVideos(oldArray => [...oldArray, newRef])
       setAllVideos(oldArray => {
         console.log('this is true')
+
+        let newObj = {}
         oldArray.listOfStreams[
           oldArray.listOfStreams.length - 1
         ].current.srcObject = event.streams[0]
         oldArray.listOfStreams = [...oldArray.listOfStreams, newRef]
         oldArray.curState = false
-        return oldArray
+
+        newObj.listOfStreams = oldArray.listOfStreams
+
+        newObj.curState = false
+        return newObj
       })
     } else {
       setAllVideos(oldArray => {
+        let newObj = {}
         console.log('this is false')
-        oldArray.curState = true
         oldArray.listOfStreams[
           oldArray.listOfStreams.length - 2
         ].current.srcObject = event.streams[0]
 
-        return oldArray
+        newObj.listOfStreams = oldArray.listOfStreams
+        newObj.curState = true
+        return newObj
       })
     }
+    console.log(allVideos)
   }
 
   function createPeerConnection() {
