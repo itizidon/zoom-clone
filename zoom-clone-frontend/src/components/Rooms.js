@@ -3,7 +3,6 @@ import io from 'socket.io-client'
 import { withRouter } from 'react-router'
 
 const socket = io('http://localhost:8000')
-let counter = 0
 
 let mediaConstraints = {
   audio: true, // We want an audio track
@@ -16,7 +15,10 @@ let userStream
 function Rooms(props) {
   const userVideo = useRef()
   const otherStreams = useRef([])
-  const [allVideos, setAllVideos] = useState([])
+  const [allVideos, setAllVideos] = useState({
+    listOfStreams: [React.createRef()],
+    curState: true
+  })
   const partnerVideo = useRef()
 
   useEffect(() => {
@@ -35,7 +37,6 @@ function Rooms(props) {
         .getTracks()
         .forEach(track => myPeerConnection.addTrack(track, userStream))
     })
-    console.log(userVideo, 'this is userVideo')
 
     socket.on('handle-new-ice-candidate', candidate => {
       if (candidate) {
@@ -79,24 +80,38 @@ function Rooms(props) {
           })
         })
     })
-  })
+  },[])
 
   function handleTrackEvent(event) {
     console.log('added events', event.streams)
-    partnerVideo.current.srcObject = event.streams[0]
+    // partnerVideo.current.srcObject = event.streams[0]
     // console.log(partnerVideo.current)
+    if (allVideos.curState === true) {
+      let newRef = React.createRef()
+      // setAllVideos(oldArray => [...oldArray, newRef])
+      setAllVideos(oldArray => {
+        console.log('this is true')
+        oldArray.listOfStreams[
+          oldArray.listOfStreams.length - 1
+        ].current.srcObject = event.streams[0]
+        oldArray.listOfStreams = [...oldArray.listOfStreams, newRef]
+        oldArray.curState = false
+        return oldArray
+      })
+    } else {
+      setAllVideos(oldArray => {
+        console.log('this is false')
+        oldArray.curState = true
+        oldArray.listOfStreams[
+          oldArray.listOfStreams.length - 2
+        ].current.srcObject = event.streams[0]
 
-    setAllVideos(oldArray=>[...oldArray, React.createRef()])
-    // allVideos.current[0].current.srcObject=event.stream[0]
-    console.log(allVideos, 'this is all videos current')
-    // allVideos.current[allVideos.current.length - 1].current = {
-    //   srcObject: event.streams[event.streams.length -1]
-    // }
-    // console.log('added track hit')
+        return oldArray
+      })
+    }
   }
 
   function createPeerConnection() {
-    console.log('created peer')
     myPeerConnection = new RTCPeerConnection({
       iceServers: [
         { urls: 'stun:stun3.l.google.com:19302' },
@@ -113,7 +128,6 @@ function Rooms(props) {
   }
 
   function handleNegotiationNeededEvent() {
-    console.log('negotiationneeded ')
     myPeerConnection
       .createOffer()
       .then(function(offer) {
@@ -128,7 +142,6 @@ function Rooms(props) {
   }
 
   function joinroom() {
-    console.log('reached join roon')
     createPeerConnection()
   }
 
@@ -141,24 +154,18 @@ function Rooms(props) {
       })
     }
   }
-  if (allVideos) {
-    console.log(allVideos, 'this is allVideos array')
-  }
+
+  console.log(allVideos, 'this is allvideos')
   return (
     <div>
       <video autoPlay ref={userVideo}></video>
-      <video autoPlay ref={partnerVideo}></video>
-      {allVideos.length >= 1
-        ? allVideos.map(cur => {
+      {/* <video autoPlay ref={partnerVideo}></video> */}
+      {allVideos.listOfStreams.length >= 1
+        ? allVideos.listOfStreams.map(cur => {
             console.log(cur, 'this is cur')
-            return <video autoPlay ref={cur.current}></video>
+            return <video autoPlay ref={cur}></video>
           })
         : null}
-      {/* <div>
-        {allVideos.map(() => {
-          return 'lol'
-        })}
-      </div> */}
       <button
         onClick={() => {
           socket.emit('connectToRooms', props.match.params.id)
