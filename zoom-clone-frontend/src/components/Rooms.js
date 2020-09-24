@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, createRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import io from 'socket.io-client'
 import { withRouter } from 'react-router'
 
@@ -7,6 +7,13 @@ const socket = io('http://localhost:8000')
 let mediaConstraints = {
   audio: true, // We want an audio track
   video: true // ...and we want a video track
+}
+
+var displayMediaOptions = {
+  video: {
+    cursor: 'always'
+  },
+  audio: true
 }
 
 let myPeerConnection
@@ -161,6 +168,19 @@ function Rooms(props) {
         }}
       >
         Connect
+      </button>
+      <button
+        onClick={() => {
+          navigator.mediaDevices
+            .getDisplayMedia(displayMediaOptions)
+            .then(videoStream => {
+              videoStream.getTracks().forEach(track => {
+                myPeerConnection.addTrack(track, videoStream)
+              })
+            })
+        }}
+      >
+        Share Screen
       </button>
     </div>
   )
