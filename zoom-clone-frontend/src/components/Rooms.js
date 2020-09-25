@@ -13,7 +13,7 @@ var displayMediaOptions = {
   video: {
     cursor: 'always'
   },
-  audio: true
+  audio: false
 }
 
 let myPeerConnection
@@ -82,34 +82,61 @@ function Rooms(props) {
   }, [])
 
   function handleTrackEvent(event) {
-    if (allVideos.curState === true) {
-      let newRef = React.createRef()
-      setAllVideos(oldArray => {
+    setAllVideos(oldArray => {
+      //if true
+      if (oldArray.curState) {
         let newObj = {}
-        oldArray.listOfStreams[
-          oldArray.listOfStreams.length - 1
-        ].current.srcObject = event.streams[0]
-        oldArray.listOfStreams = [...oldArray.listOfStreams, newRef]
-        oldArray.curState = false
 
         newObj.listOfStreams = oldArray.listOfStreams
-
         newObj.curState = false
+
         return newObj
-      })
-    } else {
-      setAllVideos(oldArray => {
+      } else {
+        let newRef = React.createRef()
         let newObj = {}
-        oldArray.listOfStreams[
-          oldArray.listOfStreams.length - 2
-        ].current.srcObject = event.streams[0]
 
         newObj.listOfStreams = oldArray.listOfStreams
+        newObj.listOfStreams[
+          newObj.listOfStreams.length - 1
+        ].current.srcObject = event.streams[0]
+
+        newObj.listOfStreams = [...oldArray.listOfStreams, newRef]
         newObj.curState = true
         return newObj
-      })
-    }
-    console.log(allVideos)
+      }
+    })
+
+    // if (allVideos.curState === true) {
+    //   setAllVideos(oldArray => {
+    //     let newRef = React.createRef()
+    //     let newObj = {}
+    //     newObj.listOfStreams = oldArray.listOfStreams
+    //     // oldArray.listOfStreams[
+    //     //   oldArray.listOfStreams.length - 1
+    //     // ].current.srcObject = event.streams[0]
+    //     // oldArray.listOfStreams = [...oldArray.listOfStreams, newRef]
+    //     // oldArray.curState = false
+
+    //     newObj.listOfStreams = [...oldArray.listOfStreams, newRef]
+    //     newObj.curState = false
+    //     return newObj
+    //   })
+    // } else {
+    //   setAllVideos(oldArray => {
+    //     let newRef = React.createRef()
+    //     let newObj = {}
+    //     // newObj.listOfStreams = [...oldArray.listOfStreams, newRef]
+    //     // oldArray.listOfStreams[
+    //     //   oldArray.listOfStreams.length - 2
+    //     // ].current.srcObject = event.streams[0]
+
+    //     // newObj.listOfStreams = oldArray.listOfStreams
+    //     newObj.curState = true
+    //     return oldArray
+    //   })
+    // }
+    console.log('added track', event)
+    console.log(allVideos, 'this is addtrack allvideos')
   }
 
   function createPeerConnection() {
@@ -154,12 +181,14 @@ function Rooms(props) {
       })
     }
   }
+
+  console.log(allVideos, 'this is rerender addvideos')
   return (
     <div>
       <video autoPlay ref={userVideo}></video>
       {allVideos.listOfStreams.length >= 1
-        ? allVideos.listOfStreams.map(cur => {
-            return <video autoPlay ref={cur}></video>
+        ? allVideos.listOfStreams.map((cur, indx) => {
+            return <video key={indx} autoPlay ref={cur}></video>
           })
         : null}
       <button
@@ -171,9 +200,13 @@ function Rooms(props) {
       </button>
       <button
         onClick={() => {
+          console.log('this is run')
           navigator.mediaDevices
             .getDisplayMedia(displayMediaOptions)
             .then(videoStream => {
+              console.log(videoStream)
+              userVideo.current.srcObject = videoStream
+
               videoStream.getTracks().forEach(track => {
                 myPeerConnection.addTrack(track, videoStream)
               })
