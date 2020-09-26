@@ -26,6 +26,7 @@ function Rooms(props) {
     listOfStreams: [React.createRef()],
     curState: true
   })
+  const [toggle, setToggle] = useState(true)
 
   useEffect(() => {
     navigator.mediaDevices.getUserMedia(mediaConstraints).then(streamz => {
@@ -163,36 +164,41 @@ function Rooms(props) {
             return <video key={indx} autoPlay ref={cur}></video>
           })
         : null}
-      <button
-        onClick={() => {
-          socket.emit('connectToRooms', props.match.params.id)
-        }}
-      >
-        Connect
-      </button>
-      <button
-        onClick={() => {
-          console.log('this is run', sentTracks)
-          navigator.mediaDevices
-            .getDisplayMedia(displayMediaOptions)
-            .then(videoStream => {
-              let screenVideo = videoStream.getTracks()[0]
-              console.log(screenVideo, 'tgus tii')
-              console.log(
-                videoStream.getTracks()[0],
-                'this is what im looking for'
-              )
+      {toggle ? (
+        <button
+          onClick={() => {
+            socket.emit('connectToRooms', props.match.params.id)
+
+            setToggle(false)
+          }}
+        >
+          Connect
+        </button>
+      ) : (
+        <button
+          onClick={() => {
+            console.log('this is run', sentTracks)
+            navigator.mediaDevices
+              .getDisplayMedia(displayMediaOptions)
+              .then(videoStream => {
+                let screenVideo = videoStream.getTracks()[0]
+                console.log(screenVideo, 'tgus tii')
+                console.log(
+                  videoStream.getTracks()[0],
+                  'this is what im looking for'
+                )
                 userVideo.current.srcObject = videoStream
-              sentTracks
-                .find(sender => {
-                  return sender.track.kind === 'video'
-                })
-                .replaceTrack(screenVideo)
-            })
-        }}
-      >
-        Share Screen
-      </button>
+                sentTracks
+                  .find(sender => {
+                    return sender.track.kind === 'video'
+                  })
+                  .replaceTrack(screenVideo)
+              })
+          }}
+        >
+          Share Screen
+        </button>
+      )}
     </div>
   )
 }
