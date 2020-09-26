@@ -27,6 +27,7 @@ function Rooms(props) {
     curState: true
   })
   const [toggle, setToggle] = useState(true)
+  const [revert, setRevert] = useState(true)
 
   useEffect(() => {
     navigator.mediaDevices.getUserMedia(mediaConstraints).then(streamz => {
@@ -174,19 +175,13 @@ function Rooms(props) {
         >
           Connect
         </button>
-      ) : (
+      ) : revert ? (
         <button
           onClick={() => {
-            console.log('this is run', sentTracks)
             navigator.mediaDevices
               .getDisplayMedia(displayMediaOptions)
               .then(videoStream => {
                 let screenVideo = videoStream.getTracks()[0]
-                console.log(screenVideo, 'tgus tii')
-                console.log(
-                  videoStream.getTracks()[0],
-                  'this is what im looking for'
-                )
                 userVideo.current.srcObject = videoStream
                 sentTracks
                   .find(sender => {
@@ -194,9 +189,24 @@ function Rooms(props) {
                   })
                   .replaceTrack(screenVideo)
               })
+
+              setRevert(false)
           }}
         >
           Share Screen
+        </button>
+      ) : (
+        <button
+          onClick={() => {
+            navigator.mediaDevices
+              .getUserMedia(mediaConstraints)
+              .then(streamz => {
+                userVideo.current.srcObject = streamz
+                userStream = streamz
+              })
+          }}
+        >
+          Share Video
         </button>
       )}
     </div>
