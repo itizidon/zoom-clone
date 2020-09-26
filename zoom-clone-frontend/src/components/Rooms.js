@@ -156,7 +156,6 @@ function Rooms(props) {
     }
   }
 
-  console.log(allVideos, 'this is rerender addvideos')
   return (
     <div>
       <video autoPlay ref={userVideo}></video>
@@ -189,8 +188,7 @@ function Rooms(props) {
                   })
                   .replaceTrack(screenVideo)
               })
-
-              setRevert(false)
+            setRevert(false)
           }}
         >
           Share Screen
@@ -203,6 +201,11 @@ function Rooms(props) {
               .then(streamz => {
                 userVideo.current.srcObject = streamz
                 userStream = streamz
+                sentTracks
+                  .find(sender => {
+                    return sender.track.kind === 'video'
+                  })
+                  .replaceTrack(userStream.getTracks()[1])
               })
           }}
         >
