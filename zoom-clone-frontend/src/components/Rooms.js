@@ -207,6 +207,7 @@ function Rooms(props) {
                   })
                   .replaceTrack(userStream.getTracks()[1])
               })
+              setRevert(true)
           }}
         >
           Share Video
