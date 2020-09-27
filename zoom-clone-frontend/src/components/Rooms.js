@@ -6,7 +6,7 @@ const socket = io('http://localhost:8000')
 
 let mediaConstraints = {
   audio: true, // We want an audio track
-  video: true // ...and we want a video track
+  video: {width: 250, height: 250} // ...and we want a video track
 }
 
 var displayMediaOptions = {
@@ -161,7 +161,7 @@ function Rooms(props) {
       <video autoPlay ref={userVideo}></video>
       {allVideos.listOfStreams.length >= 1
         ? allVideos.listOfStreams.map((cur, indx) => {
-            return <video key={indx} autoPlay ref={cur}></video>
+            return <video key={indx} autoPlay ref={cur} className='stream'></video>
           })
         : null}
       {toggle ? (
