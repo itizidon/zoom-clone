@@ -6,7 +6,7 @@ const socket = io('http://localhost:8000')
 
 let mediaConstraints = {
   audio: true, // We want an audio track
-  video: {width: 250, height: 250} // ...and we want a video track
+  video: { width: 250, height: 250 } // ...and we want a video track
 }
 
 var displayMediaOptions = {
@@ -86,6 +86,32 @@ function Rooms(props) {
     })
   }, [])
 
+  function disconnect() {
+    if (myPeerConnection) {
+      myPeerConnection.ontrack = null
+      myPeerConnection.onremovetrack = null
+      myPeerConnection.onremovestream = null
+      myPeerConnection.onicecandidate = null
+      myPeerConnection.oniceconnectionstatechange = null
+      myPeerConnection.onsignalingstatechange = null
+      myPeerConnection.onicegatheringstatechange = null
+      myPeerConnection.onnegotiationneeded = null
+
+      allVideos.listOfStreams.map(cur => {
+        if (cur.current.srcObject) {
+          cur.current.srcObject.getTracks().forEach(track => track.stop())
+        }
+      })
+
+      // if (localVideo.srcObject) {
+      //   localVideo.srcObject.getTracks().forEach(track => track.stop())
+      // }
+
+      myPeerConnection.close()
+      myPeerConnection = null
+    }
+  }
+
   function handleTrackEvent(event) {
     setAllVideos(oldArray => {
       //if true
@@ -161,7 +187,9 @@ function Rooms(props) {
       <video autoPlay ref={userVideo}></video>
       {allVideos.listOfStreams.length >= 1
         ? allVideos.listOfStreams.map((cur, indx) => {
-            return <video key={indx} autoPlay ref={cur} className='stream'></video>
+            return (
+              <video key={indx} autoPlay ref={cur} className="stream"></video>
+            )
           })
         : null}
       {toggle ? (
@@ -174,44 +202,57 @@ function Rooms(props) {
         >
           Connect
         </button>
-      ) : revert ? (
-        <button
-          onClick={() => {
-            navigator.mediaDevices
-              .getDisplayMedia(displayMediaOptions)
-              .then(videoStream => {
-                let screenVideo = videoStream.getTracks()[0]
-                userVideo.current.srcObject = videoStream
-                sentTracks
-                  .find(sender => {
-                    return sender.track.kind === 'video'
-                  })
-                  .replaceTrack(screenVideo)
-              })
-            setRevert(false)
-          }}
-        >
-          Share Screen
-        </button>
       ) : (
-        <button
-          onClick={() => {
-            navigator.mediaDevices
-              .getUserMedia(mediaConstraints)
-              .then(streamz => {
-                userVideo.current.srcObject = streamz
-                userStream = streamz
-                sentTracks
-                  .find(sender => {
-                    return sender.track.kind === 'video'
+        <div>
+          {revert ? (
+            <button
+              onClick={() => {
+                navigator.mediaDevices
+                  .getDisplayMedia(displayMediaOptions)
+                  .then(videoStream => {
+                    let screenVideo = videoStream.getTracks()[0]
+                    userVideo.current.srcObject = videoStream
+                    sentTracks
+                      .find(sender => {
+                        return sender.track.kind === 'video'
+                      })
+                      .replaceTrack(screenVideo)
                   })
-                  .replaceTrack(userStream.getTracks()[1])
-              })
-              setRevert(true)
-          }}
-        >
-          Share Video
-        </button>
+                setRevert(false)
+              }}
+            >
+              Share Screen
+            </button>
+          ) : (
+            <div>
+              <button
+                onClick={() => {
+                  navigator.mediaDevices
+                    .getUserMedia(mediaConstraints)
+                    .then(streamz => {
+                      userVideo.current.srcObject = streamz
+                      userStream = streamz
+                      sentTracks
+                        .find(sender => {
+                          return sender.track.kind === 'video'
+                        })
+                        .replaceTrack(userStream.getTracks()[1])
+                    })
+                  setRevert(true)
+                }}
+              >
+                Share Video
+              </button>
+            </div>
+          )}
+          <button
+            onClick={() => {
+              disconnect()
+            }}
+          >
+            Disconnect
+          </button>
+        </div>
       )}
     </div>
   )
