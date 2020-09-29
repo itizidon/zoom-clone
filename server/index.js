@@ -19,8 +19,6 @@ io.on('connection', socket => {
         io.to(roomNum).emit('connectToRoom')
       } else {
         room[roomNum].add(socket.id)
-        console.log(room[roomNum].elementAt(0))
-        console.log(room[roomNum].elementAt(1))
         socket.to(roomNum).emit('makeConnection')
       }
     })
@@ -38,25 +36,8 @@ io.on('connection', socket => {
     socket.to(roomNum).emit('handle-new-ice-candidate-to-room', candidate)
   })
 
-  socket.on('join room', roomNum => {
-    if (room.empty) {
-      io.to(socket.id).emit('first guy')
-      room.empty = false
-    } else {
-      socket.broadcast.emit('createConnection')
-    }
-  })
-
-  socket.on('video-offer', createdOffer => {
-    socket.broadcast.emit('handle-video-offer', createdOffer)
-  })
-
-  socket.on('video-answer', createdAnswer => {
-    socket.broadcast.emit('handle-video-answer', createdAnswer)
-  })
-
-  socket.on('new-ice-candidate', candidate => {
-    socket.broadcast.emit('handle-new-ice-candidate', candidate)
+  socket.on('changeName', name =>{
+    console.log(name)
   })
 })
 

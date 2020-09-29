@@ -187,11 +187,11 @@ function Rooms(props) {
       <form
         onSubmit={event => {
           event.preventDefault()
-          console.log(event)
+          socket.emit('changeName', event.target.name.value)
         }}
       >
         <label>
-          <input type="text"></input>
+          <input type="text" name="name"></input>
         </label>
       </form>
       <video autoPlay ref={userVideo}></video>
