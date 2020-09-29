@@ -1,4 +1,4 @@
-function LinkedHand() {
+export default function RoomList() {
   let head = null
   let Node = function(user) {
     this.user = {userid: user,

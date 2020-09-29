@@ -6,6 +6,7 @@ const server = http.createServer(app)
 import socket from 'socket.io'
 const io = socket(server)
 import cors from 'cors'
+import RoomList from './util/util'
 
 let room = {  }
 
@@ -13,10 +14,13 @@ io.on('connection', socket => {
   socket.on('connectToRooms', roomNum => {
     socket.join(roomNum, () => {
       if (Object.keys(io.sockets.adapter.rooms[roomNum].sockets).length === 1) {
-        room[roomNum] = {host: socket.id}
-        console.log(room)
+        room[roomNum] = new RoomList()
+        room[roomNum].add(socket.id)
         io.to(roomNum).emit('connectToRoom')
       } else {
+        room[roomNum].add(socket.id)
+        console.log(room[roomNum].elementAt(0))
+        console.log(room[roomNum].elementAt(1))
         socket.to(roomNum).emit('makeConnection')
       }
     })
