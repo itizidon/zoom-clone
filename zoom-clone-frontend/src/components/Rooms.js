@@ -184,6 +184,16 @@ function Rooms(props) {
 
   return (
     <div>
+      <form
+        onSubmit={event => {
+          event.preventDefault()
+          console.log(event)
+        }}
+      >
+        <label>
+          <input type="text"></input>
+        </label>
+      </form>
       <video autoPlay ref={userVideo}></video>
       {allVideos.listOfStreams.length >= 1
         ? allVideos.listOfStreams.map((cur, indx) => {

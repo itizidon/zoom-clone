@@ -7,12 +7,14 @@ import socket from 'socket.io'
 const io = socket(server)
 import cors from 'cors'
 
-let room = { empty: true }
+let room = {  }
 
 io.on('connection', socket => {
   socket.on('connectToRooms', roomNum => {
     socket.join(roomNum, () => {
       if (Object.keys(io.sockets.adapter.rooms[roomNum].sockets).length === 1) {
+        room[roomNum] = {host: socket.id}
+        console.log(room)
         io.to(roomNum).emit('connectToRoom')
       } else {
         socket.to(roomNum).emit('makeConnection')
