@@ -187,7 +187,7 @@ function Rooms(props) {
       <form
         onSubmit={event => {
           event.preventDefault()
-          socket.emit('changeName', event.target.name.value)
+          socket.emit('changeName', {name: event.target.name.value, roomNum: props.match.params.id})
         }}
       >
         <label>

@@ -1,8 +1,8 @@
 export default function RoomList() {
   let head = null
   let Node = function(user) {
-    this.user = {userid: user,
-    userName: null}
+    this.user = user
+    this.userName = null
     this.next = null
   }
 
@@ -25,10 +25,20 @@ export default function RoomList() {
       head = user
     } else {
       let currentNode = head
-      while(currentNode.next){
+      while (currentNode.next) {
         currentNode = currentNode.next
       }
       currentNode.next = user
+    }
+  }
+
+  this.changeName = function(user, name, currentNodeAdd = head) {
+    let currentNode = currentNodeAdd
+    if(user === currentNode.user){
+      currentNode.name = name
+    }
+    else{
+      this.changeName(user, name, currentNode.next)
     }
   }
 

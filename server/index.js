@@ -36,8 +36,8 @@ io.on('connection', socket => {
     socket.to(roomNum).emit('handle-new-ice-candidate-to-room', candidate)
   })
 
-  socket.on('changeName', name =>{
-    console.log(name)
+  socket.on('changeName', ({roomNum, name}) =>{
+    room[roomNum].changeName(socket.id, name)
   })
 })
 
