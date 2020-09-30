@@ -8,7 +8,7 @@ const io = socket(server)
 import cors from 'cors'
 import RoomList from './util/util'
 
-let room = {  }
+let room = {}
 
 io.on('connection', socket => {
   socket.on('connectToRooms', roomNum => {
@@ -36,8 +36,11 @@ io.on('connection', socket => {
     socket.to(roomNum).emit('handle-new-ice-candidate-to-room', candidate)
   })
 
-  socket.on('changeName', ({roomNum, name}) =>{
+  socket.on('changeName', ({ roomNum, name }) => {
     room[roomNum].changeName(socket.id, name)
+    for (let x = 0; x < room[roomNum].size(); x++) {
+      io.to(roomNum).emit('changedNames',room[roomNum].elementAt(x).name, x)
+    }
   })
 })
 

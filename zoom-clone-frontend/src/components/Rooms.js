@@ -28,6 +28,7 @@ function Rooms(props) {
   })
   const [toggle, setToggle] = useState(true)
   const [revert, setRevert] = useState(true)
+  const [names, setNames] = useState([])
 
   useEffect(() => {
     navigator.mediaDevices.getUserMedia(mediaConstraints).then(streamz => {
@@ -37,6 +38,14 @@ function Rooms(props) {
 
     socket.on('connectToRoom', () => {
       joinroom()
+    })
+
+    socket.on('changedNames', (name, index) => {
+      setNames(oldArray =>{
+        let newArray = [...oldArray]
+        newArray[index] = name
+        return newArray
+      })
     })
 
     socket.on('makeConnection', () => {
@@ -187,7 +196,10 @@ function Rooms(props) {
       <form
         onSubmit={event => {
           event.preventDefault()
-          socket.emit('changeName', {name: event.target.name.value, roomNum: props.match.params.id})
+          socket.emit('changeName', {
+            name: event.target.name.value,
+            roomNum: props.match.params.id
+          })
         }}
       >
         <label>
@@ -198,7 +210,10 @@ function Rooms(props) {
       {allVideos.listOfStreams.length >= 1
         ? allVideos.listOfStreams.map((cur, indx) => {
             return (
-              <video key={indx} autoPlay ref={cur} className="stream"></video>
+              <div key={indx}>
+                <p>{names[indx]}</p>
+                <video autoPlay ref={cur} className="stream"></video>
+              </div>
             )
           })
         : null}
