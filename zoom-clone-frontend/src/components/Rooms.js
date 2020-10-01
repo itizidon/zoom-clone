@@ -41,7 +41,7 @@ function Rooms(props) {
     })
 
     socket.on('changedNames', (name, index) => {
-      setNames(oldArray =>{
+      setNames(oldArray => {
         let newArray = [...oldArray]
         newArray[index] = name
         return newArray
@@ -111,10 +111,6 @@ function Rooms(props) {
           cur.current.srcObject.getTracks().forEach(track => track.stop())
         }
       })
-
-      // if (localVideo.srcObject) {
-      //   localVideo.srcObject.getTracks().forEach(track => track.stop())
-      // }
 
       myPeerConnection.close()
       myPeerConnection = null
@@ -192,33 +188,37 @@ function Rooms(props) {
   }
 
   return (
-    <div>
-      <form
-        onSubmit={event => {
-          event.preventDefault()
-          socket.emit('changeName', {
-            name: event.target.name.value,
-            roomNum: props.match.params.id
-          })
-        }}
-      >
-        <label>
-          <input type="text" name="name"></input>
-        </label>
-      </form>
-      <video autoPlay ref={userVideo}></video>
+    <div className="border">
+      {toggle ? null : (
+        <form
+          onSubmit={event => {
+            event.preventDefault()
+            socket.emit('changeName', {
+              name: event.target.name.value,
+              roomNum: props.match.params.id
+            })
+          }}
+        >
+          <label>
+            <input type="text" name="name"></input>
+          </label>
+        </form>
+      )}
+
+      <video autoPlay ref={userVideo} className="videocard"></video>
+
       {allVideos.listOfStreams.length >= 1
         ? allVideos.listOfStreams.map((cur, indx) => {
             return (
               <div key={indx}>
                 <p>{names[indx]}</p>
-                <video autoPlay ref={cur} className="stream"></video>
+                <video autoPlay ref={cur} className="videocard"></video>
               </div>
             )
           })
         : null}
       {toggle ? (
-        <button
+        <button className="actions"
           onClick={() => {
             socket.emit('connectToRooms', props.match.params.id)
 
@@ -230,7 +230,7 @@ function Rooms(props) {
       ) : (
         <div>
           {revert ? (
-            <button
+            <button className="actions"
               onClick={() => {
                 navigator.mediaDevices
                   .getDisplayMedia(displayMediaOptions)
@@ -250,7 +250,7 @@ function Rooms(props) {
             </button>
           ) : (
             <div>
-              <button
+              <button className="actions"
                 onClick={() => {
                   navigator.mediaDevices
                     .getUserMedia(mediaConstraints)
@@ -270,7 +270,7 @@ function Rooms(props) {
               </button>
             </div>
           )}
-          <button
+          <button className="actions"
             onClick={() => {
               disconnect()
             }}

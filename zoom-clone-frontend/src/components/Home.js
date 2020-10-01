@@ -7,9 +7,9 @@ let id = null
 function Home() {
   const [toggle, setToggle] = useState(true)
   return (
-    <div>
-      LOL
+    <div className={'createroom'}>
       {toggle ? null : <Redirect to={`/rooms/${id}`}></Redirect>}
+
       <button
         onClick={() => {
           setToggle(false)
