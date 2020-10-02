@@ -29,9 +29,12 @@ function Rooms(props) {
   const [toggle, setToggle] = useState(true)
   const [revert, setRevert] = useState(true)
   const [names, setNames] = useState([])
+  const [linkToggle, setLinkToggle] = useState(true)
 
   useEffect(() => {
-    navigator.clipboard.writeText(`http://localhost:3000/rooms/${props.match.params.id}`)
+    navigator.clipboard.writeText(
+      `http://localhost:3000/rooms/${props.match.params.id}`
+    )
 
     navigator.mediaDevices.getUserMedia(mediaConstraints).then(streamz => {
       userVideo.current.srcObject = streamz
@@ -191,6 +194,30 @@ function Rooms(props) {
 
   return (
     <div className="border">
+      {linkToggle ? (
+        <div>
+          <h1>
+            Link Copied
+            <button
+              onClick={() => {
+                setLinkToggle(false)
+              }}
+            >
+              Got It
+            </button>
+          </h1>
+        </div>
+      ) : (
+        <button
+          onClick={() => {
+            navigator.clipboard.writeText(
+              `http://localhost:3000/rooms/${props.match.params.id}`
+            )
+          }}
+        >
+          copy link
+        </button>
+      )}
       {toggle ? null : (
         <form
           onSubmit={event => {
@@ -220,7 +247,8 @@ function Rooms(props) {
           })
         : null}
       {toggle ? (
-        <button className="actions"
+        <button
+          className="actions"
           onClick={() => {
             socket.emit('connectToRooms', props.match.params.id)
 
@@ -232,7 +260,8 @@ function Rooms(props) {
       ) : (
         <div>
           {revert ? (
-            <button className="actions"
+            <button
+              className="actions"
               onClick={() => {
                 navigator.mediaDevices
                   .getDisplayMedia(displayMediaOptions)
@@ -252,7 +281,8 @@ function Rooms(props) {
             </button>
           ) : (
             <div>
-              <button className="actions"
+              <button
+                className="actions"
                 onClick={() => {
                   navigator.mediaDevices
                     .getUserMedia(mediaConstraints)
@@ -272,7 +302,8 @@ function Rooms(props) {
               </button>
             </div>
           )}
-          <button className="actions"
+          <button
+            className="actions"
             onClick={() => {
               disconnect()
             }}
