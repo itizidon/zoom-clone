@@ -31,6 +31,8 @@ function Rooms(props) {
   const [names, setNames] = useState([])
 
   useEffect(() => {
+    navigator.clipboard.writeText(`http://localhost:3000/rooms/${props.match.params.id}`)
+
     navigator.mediaDevices.getUserMedia(mediaConstraints).then(streamz => {
       userVideo.current.srcObject = streamz
       userStream = streamz
