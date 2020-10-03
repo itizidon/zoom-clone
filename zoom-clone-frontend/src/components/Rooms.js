@@ -245,7 +245,8 @@ function Rooms(props) {
               </div>
             )
           })
-        : null}
+        : null
+        }
       {toggle ? (
         <button
           className="actions"
