@@ -191,7 +191,7 @@ function Rooms(props) {
       })
     }
   }
-
+  console.log(allVideos.listOfStreams)
   return (
     <div className="border">
       {linkToggle ? (
@@ -238,7 +238,7 @@ function Rooms(props) {
 
       {allVideos.listOfStreams.length >= 1
         ? allVideos.listOfStreams.map((cur, indx) => {
-            return (
+            return cur.current.srcObject === null ? null : (
               <div key={indx}>
                 <p>{names[indx]}</p>
                 <video autoPlay ref={cur} className="videocard"></video>
