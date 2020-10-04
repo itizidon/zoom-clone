@@ -238,7 +238,7 @@ function Rooms(props) {
 
       {allVideos.listOfStreams.length >= 1
         ? allVideos.listOfStreams.map((cur, indx) => {
-            return cur.current.srcObject === null ? null : (
+            return (
               <div key={indx}>
                 <p>{names[indx]}</p>
                 <video autoPlay ref={cur} className="videocard"></video>
