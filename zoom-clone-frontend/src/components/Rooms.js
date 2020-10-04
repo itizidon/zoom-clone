@@ -229,24 +229,30 @@ function Rooms(props) {
           }}
         >
           <label>
+            Nickname:
             <input type="text" name="name"></input>
           </label>
         </form>
       )}
-
-      <video autoPlay ref={userVideo} className="videocard"></video>
-
-      {allVideos.listOfStreams.length >= 1
-        ? allVideos.listOfStreams.map((cur, indx) => {
-            return (
-              <div key={indx}>
-                <p>{names[indx]}</p>
-                <video autoPlay ref={cur} className="videocard"></video>
-              </div>
-            )
-          })
-        : null
-        }
+      <div>
+        <div className="videoBorder">
+          <video autoPlay ref={userVideo} className="videocard"></video>
+        </div>
+        {allVideos.listOfStreams.length >= 1
+          ? allVideos.listOfStreams.map((cur, indx) => {
+              return indx === allVideos.listOfStreams.length - 1 ? (
+                <div className="videoBorder" key={indx}>
+                  <video autoPlay ref={cur} height={0} width={0}></video>
+                </div>
+              ) : (
+                <div key={indx} className="videoBorder">
+                  <p>{names[indx]}</p>
+                  <video autoPlay ref={cur} className="videocard"></video>
+                </div>
+              )
+            })
+          : null}
+      </div>
       {toggle ? (
         <button
           className="actions"
